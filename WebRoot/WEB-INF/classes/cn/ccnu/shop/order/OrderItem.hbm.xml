@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="cn.ccnu.shop.order.OrderItem" table="orderitem">
+		<id name="itemid" column="itemid">
+			<generator class="native"/>
+		</id>
+		
+		<property name="count"/>
+		<property name="subtotal"/>
+		
+		<many-to-one name="product" class="cn.ccnu.shop.product.Product" column="pid" lazy="false"/>
+		
+		<many-to-one name="order" class="cn.ccnu.shop.order.Order" column="oid"/>
+		
+	</class>
+</hibernate-mapping>

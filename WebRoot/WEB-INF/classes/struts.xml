@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+
+    <constant name="struts.devMode" value="false" />
+
+    <package name="default" namespace="/" extends="struts-default">
+    
+        <interceptors>
+          <interceptor name="AdminLoginInterceptor" class="cn.ccnu.shop.web.interceptor.AdminLoginInterceptor"/>
+        </interceptors>
+    
+        <global-results>
+        	<result name="msg">/WEB-INF/jsp/msg.jsp</result>
+        	<result name="login">/admin/index.jsp</result>       
+        </global-results>
+    
+		<!-- 配置首页访问的Action -->
+		<action name="index" class="indexAction">
+			<result name="indexSuccess">/WEB-INF/jsp/index.jsp</result>
+		</action>
+		
+		<!-- 配置用户的Action -->
+		<action name="user_*" class="userAction" method="{1}">
+			 <result name="registPageSuccess">/WEB-INF/jsp/regist.jsp</result>
+			 <result name="registInput">/WEB-INF/jsp/regist.jsp</result>
+			 <result name="registSuccess">/WEB-INF/jsp/msg.jsp</result>
+			 <result name="SendMailFailure">/WEB-INF/jsp/regist.jsp</result>
+			 <result name="activeSuccess">/WEB-INF/jsp/msg.jsp</result>
+			 <result name="loginPageSuccess">/WEB-INF/jsp/login.jsp</result>
+			 <result name="loginInput">/WEB-INF/jsp/login.jsp</result>
+			 <result name="loginSuccess" type="redirectAction">index</result>
+			 <result name="loginOut" type="redirectAction">index</result>
+		</action>
+		
+		<!-- 配置验证码的Action -->
+		<action name="CheckCode" class="CheckCodeAction"/>
+		
+		<!-- 配置一级分类的Action -->
+		<action name="category_*" class="categoryAction" method="{1}">
+		   <result name="adminFindAllSuccess">/admin/category/list.jsp</result>
+		   <result name="saveFailure">/admin/category/add.jsp</result>
+		   <result name="saveSuccess" type="redirectAction">category_adminFindAll</result>
+		   <result name="deleteSuccess" type="redirectAction">category_adminFindAll</result>
+		   <result name="editPreSuccess">/admin/category/edit.jsp</result>
+		   <result name="updateFailure">/admin/category/edit.jsp</result>
+		   <result name="updateSuccess" type="redirectAction">category_adminFindAll</result>
+		   
+		   <interceptor-ref name="AdminLoginInterceptor"/>
+		   <interceptor-ref name="defaultStack"/>
+		</action>
+		
+		<!-- 配置商品的Action -->
+		<action name="product_*" class="productAction" method="{1}">
+			<result name="findByCidSuccess">/WEB-INF/jsp/list.jsp</result>
+			<result name="findByCsidSuccess">/WEB-INF/jsp/cslist.jsp</result>
+			<result name="findByPidSuccess">/WEB-INF/jsp/desc.jsp</result>
+			
+			<result name="adminFindAllSuccess">/admin/product/list.jsp</result>
+			<result name="addPageSuccess">/admin/product/add.jsp</result>
+			<result name="saveSuccess" type="redirectAction">product_adminFindAll?page=1</result>
+			
+			 <interceptor-ref name="AdminLoginInterceptor">
+			 	<param name="excludeMethods">findByCid,findByCsid,findByPid</param>
+			 </interceptor-ref>
+		   <interceptor-ref name="defaultStack"/>
+		</action>
+		
+		<!-- 配置购物车的Action -->
+		<action name="cart_*" class="cartAction" method="{1}">
+		   <result name="addCartItemSuccess">/WEB-INF/jsp/cart.jsp</result>
+		   <result name="removeCartItemSucess">/WEB-INF/jsp/cart.jsp</result>
+		   <result name="clearCartSucess">/WEB-INF/jsp/cart.jsp</result>
+		   <result name="myCartSucess">/WEB-INF/jsp/cart.jsp</result>
+		</action>
+		
+		<!-- 配置订单的Action -->
+		<action name="order_*" class="orderAction" method="{1}">
+			<result name="saveOrderSuccess">/WEB-INF/jsp/order.jsp</result>
+			<result name="myOrderSuccess">/WEB-INF/jsp/orderlist.jsp</result>
+			<result name="findByOidSuccess">/WEB-INF/jsp/order.jsp</result>
+			<result name="confirmByOidSuccess" type="redirectAction">order_myOrder</result>
+			
+			<result name="adminFindAllSuccess">/admin/order/list.jsp</result>
+			<result name="adminUpdateStateSuccess" type="redirectAction">order_adminFindAll?page=1</result>
+			<result name="adminFindByStateSuccess">/admin/order/statelist.jsp</result>
+			
+			<interceptor-ref name="AdminLoginInterceptor">
+			 	<param name="includeMethods">adminFindAll,adminUpdate,adminFindByState</param>
+			 </interceptor-ref>
+		   <interceptor-ref name="defaultStack"/>
+		</action>
+		<!-- 配置管理员的Action -->
+		<action name="adminUser_*" class="adminUserAction" method="{1}">
+			<result name="loginSuccess" type="redirect">/admin/home.jsp</result>
+			
+			<interceptor-ref name="AdminLoginInterceptor">
+				<param name="excludeMethods">login</param>
+			</interceptor-ref>
+			<interceptor-ref name="defaultStack"></interceptor-ref>
+		</action>
+		<!-- 配置二级分类的Action -->
+		<action name="categorySecond_*" class="categorySecondAction" method="{1}">
+			<result name="adminFindAllSuccess">/admin/categorysecond/list.jsp</result>
+			<result name="addPageSuccess">/admin/categorysecond/add.jsp</result>
+			<result name="saveFailure">/admin/categorysecond/add.jsp</result>
+			<result name="saveSuccess" type="redirectAction">categorySecond_adminFindAll?page=1</result>
+		    <result name="deleteSuccess" type="redirectAction">categorySecond_adminFindAll?page=1</result>
+		    
+		    <interceptor-ref name="AdminLoginInterceptor"/>
+		    <interceptor-ref name="defaultStack"/>
+		</action>
+    </package>
+</struts>

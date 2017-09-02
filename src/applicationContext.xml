@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+	
+	<!-- 引入外部jdbc.properties文件 -->
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+	
+	<!-- 配置连接池的信息 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<!-- 数据库连接的四个基本参数 -->
+		<property name="driverClass" value="${jdbc.driver}"/>
+		<property name="jdbcUrl" value="${jdbc.url}"/>
+		<property name="user" value="${jdbc.user}"/>
+		<property name="password" value="${jdbc.password}"/>
+	</bean>
+	
+	<!-- 配置Hibernate的相关属性 -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<!-- 注入连接池 -->
+		<property name="dataSource" ref="dataSource"/>
+		<!-- 配置Hibernate的其他的属性 -->
+		<property name="hibernateProperties">
+			<props>
+				<!-- Hibernate的方言 -->
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.connection.autocommit">false</prop>
+			</props>
+		</property>
+		<!-- 配置映射文件 -->
+		<property name="mappingResources">
+		   <list>
+		      <value>cn/ccnu/shop/user/User.hbm.xml</value>
+		      <value>cn/ccnu/shop/category/Category.hbm.xml</value>
+		      <value>cn/ccnu/shop/categorysecond/CategorySecond.hbm.xml</value>
+		      <value>cn/ccnu/shop/product/Product.hbm.xml</value>
+		      <value>cn/ccnu/shop/order/Order.hbm.xml</value>
+		      <value>cn/ccnu/shop/order/OrderItem.hbm.xml</value>
+		      <value>cn/ccnu/shop/adminuser/AdminUser.hbm.xml</value>
+		   </list>
+		</property>
+	</bean>
+	
+	<!-- 声明式事务管理 -->
+	<!-- 配置事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<!-- 注入 sessionFactory-->
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+	
+	<!-- 配置Action================================== -->
+	<bean id="indexAction" class="cn.ccnu.shop.index.IndexAction" scope="prototype">
+		<property name="categoryService" ref="categoryService"/>	
+		<property name="productService" ref="productService"/>
+	</bean>
+    <bean id="userAction" class="cn.ccnu.shop.user.UserAction" scope="prototype">
+        <property name="userService" ref="userService"/>
+    </bean>
+	<bean id="CheckCodeAction" class="cn.ccnu.shop.user.CheckCodeAction" scope="prototype"/>
+	<bean id="categoryAction" class="cn.ccnu.shop.category.CategoryAction" scope="prototype">
+	    <property name="categoryService" ref="categoryService"/>
+	</bean>
+	<bean id="productAction" class="cn.ccnu.shop.product.ProductAction" scope="prototype">
+	   <property name="productService" ref="productService"/>
+	   <property name="categoryService" ref="categoryService"/>
+	   <property name="categorySecondService" ref="CategorySecondService"/>
+	</bean>
+	<bean id="cartAction" class="cn.ccnu.shop.cart.CartAction" scope="prototype">
+	   <property name="productService" ref="productService"/>
+	</bean>
+	<bean id="orderAction" class="cn.ccnu.shop.order.OrderAction" scope="prototype">
+		<property name="orderService" ref="orderService"/>
+	</bean>
+	<bean id="adminUserAction" class="cn.ccnu.shop.adminuser.AdminUserAction" scope="prototype">
+		<property name="adminUserService" ref="adminUserService"/>
+	</bean>
+	<bean id="categorySecondAction" class="cn.ccnu.shop.categorysecond.CategorysecondAction" scope="prototype">
+	   <property name="categorySecondService" ref="CategorySecondService"/>
+	   <property name="categoryervice" ref="categoryService"/>
+	</bean>
+	<!-- 配置Service================================== -->
+	<bean id="userService" class="cn.ccnu.shop.user.UserService">
+	  <property name="userDao" ref="userDao"/>
+	</bean>
+	<bean id="categoryService" class="cn.ccnu.shop.category.CategoryService">
+	   <property name="categoryDao" ref="CategoryDao"/>
+	</bean>
+	<bean id="productService" class="cn.ccnu.shop.product.ProductService">
+		<property name="productDao" ref="ProductDao"/>
+	</bean>
+	<bean id="orderService" class="cn.ccnu.shop.order.OrderService">
+	    <property name="orderDao" ref="orderDao"></property>
+	</bean>
+	<bean id="adminUserService" class="cn.ccnu.shop.adminuser.AdminUserService">
+		<property name="adminUserDao" ref="adminUserDao"/>
+	</bean>
+	<bean id="CategorySecondService" class="cn.ccnu.shop.categorysecond.CategorySecondService">
+		<property name="categorySecondDao" ref="categorySecondDao"/>
+	</bean>
+	<!-- 配置Dao================================== -->
+	<bean id="userDao" class="cn.ccnu.shop.user.UserDao">
+	   <property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean id="CategoryDao" class="cn.ccnu.shop.category.CategoryDao">
+	   <property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean id="ProductDao" class="cn.ccnu.shop.product.ProductDao">
+	   <property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean id="orderDao" class="cn.ccnu.shop.order.OrderDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean id="adminUserDao" class="cn.ccnu.shop.adminuser.AdminUserDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean id="categorySecondDao" class="cn.ccnu.shop.categorysecond.CategorySecondDao">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+</beans>
